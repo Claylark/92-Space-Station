@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>平仲空间站 | 92 Space Station</title>
+  <!-- 引入外部资源 -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Tailwind配置 -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#F59E0B', // 主色调：暖黄色
+            secondary: '#D97706',
+            accent: '#EC4899',
+            rail: '#8B5CF6',
+            light: '#FFFBF0', // 浅黄色背景
+          },
+          fontFamily: {
+            inter: ['Inter', 'sans-serif'],
+          },
+        },
+      }
+    }
+  </script>
+  
+  <style type="text/tailwindcss">
+    @layer utilities {
+      .content-auto {
+        content-visibility: auto;
+      }
+      .text-shadow {
+        text-shadow: 0 2px 10px rgba(245, 158, 11, 0.2);
+      }
+      .card-hover {
+        transition: all 0.3s ease;
+      }
+      .card-hover:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px -5px rgba(245, 158, 11, 0.15);
+      }
+      .tag-hover {
+        transition: all 0.2s ease;
+      }
+      .tag-hover:hover {
+        transform: scale(1.05);
+      }
+      .scroll-container {
+        scrollbar-width: thin;
+        scrollbar-color: rgba(245, 158, 11, 0.3) transparent;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+      .scroll-container::-webkit-scrollbar {
+        height: 6px;
+      }
+      .scroll-container::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      .scroll-container::-webkit-scrollbar-thumb {
+        background-color: rgba(245, 158, 11, 0.3);
+        border-radius: 3px;
+      }
+      /* 导航项高亮样式 */
+      .nav-active {
+        @apply text-primary border-b-2 border-primary pb-1;
+      }
+      /* CN小窗口样式 */
+      .cn-window {
+        @apply bg-white/90 backdrop-blur-sm border border-primary/20 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow;
+      }
+      /* 时间线样式 */
+      .timeline-item::before {
+        content: '';
+        position: absolute;
+        left: -29px;
+        top: 5px;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: #F59E0B;
+        border: 2px solid white;
+      }
+      .timeline-item::after {
+        content: '';
+        position: absolute;
+        left: -24px;
+        top: 25px;
+        width: 2px;
+        height: calc(100% + 15px);
+        background: rgba(245, 158, 11, 0.2);
+      }
+      .timeline-item:last-child::after {
+        display: none;
+      }
+    }
+  </style>
+</head>
+
+<body class="font-inter bg-gradient-to-br from-amber-50 to-yellow-50 text-slate-800 min-h-screen">
+  <!-- 背景装饰 -->
+  <div class="fixed inset-0 overflow-hidden pointer-events-none z-0">
+    <div class="absolute -top-20 -right-20 w-96 h-96 bg-primary/10 rounded-full blur-3xl"></div>
+    <div class="absolute top-1/3 -left-40 w-96 h-96 bg-secondary/10 rounded-full blur-3xl"></div>
+    <div class="absolute bottom-0 right-1/4 w-80 h-80 bg-rail/10 rounded-full blur-3xl"></div>
+  </div>
+
+  <!-- 导航栏 -->
+  <nav class="fixed w-full bg-white/90 backdrop-blur-md z-50 transition-all duration-300 shadow-sm" id="navbar">
+    <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+      <div class="flex items-center space-x-2 relative">
+        <span class="font-bold text-xl text-primary relative z-10">92 Space Station</span>
+        <span class="absolute right-0 bottom-[-8px] text-xs text-primary/70 font-medium z-0">平仲空间站</span>
+      </div>
+      
+      <div class="hidden md:flex items-center space-x-8">
+        <a href="#profile" class="font-medium hover:text-primary transition-colors nav-link">个人资料</a>
+        <a href="#interests" class="font-medium hover:text-primary transition-colors nav-link">兴趣爱好</a>
+        <a href="#looking-for" class="font-medium hover:text-primary transition-colors nav-link">想认识</a>
+        <a href="#contact" class="font-medium hover:text-primary transition-colors nav-link">联系方式</a>
+        <a href="#history" class="font-medium hover:text-primary transition-colors nav-link">属性历史</a>
+      </div>
+      
+      <button class="md:hidden text-slate-800 text-xl" id="menuBtn">
+        <i class="fa fa-bars"></i>
+      </button>
+    </div>
+    
+    <div class="md:hidden hidden bg-white shadow-md absolute w-full" id="mobileMenu">
+      <div class="container mx-auto px-4 py-3 flex flex-col space-y-4">
+        <a href="#profile" class="font-medium py-2 hover:text-primary transition-colors nav-link">个人资料</a>
+        <a href="#interests" class="font-medium py-2 hover:text-primary transition-colors nav-link">兴趣爱好</a>
+        <a href="#looking-for" class="font-medium py-2 hover:text-primary transition-colors nav-link">想认识</a>
+        <a href="#contact" class="font-medium py-2 hover:text-primary transition-colors nav-link">联系方式</a>
+        <a href="#history" class="font-medium py-2 hover:text-primary transition-colors nav-link">属性历史</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- 英雄区域 -->
+  <header class="pt-32 pb-20 md:pt-40 md:pb-32 px-4 text-center relative z-10">
+    <div class="container mx-auto max-w-4xl">
+      <div class="relative w-36 h-36 md:w-48 md:h-48 mx-auto mb-8 rounded-full overflow-hidden border-4 border-primary/30 shadow-lg transform transition-transform hover:scale-105">
+        <img src="https://picsum.photos/id/237/200/200" alt="平仲的头像" 
+             class="w-full h-full object-cover" loading="lazy">
+        <div class="absolute inset-0 bg-gradient-to-t from-primary/20 to-transparent"></div>
+      </div>
+      
+      <h1 class="text-[clamp(2rem,5vw,3.5rem)] font-bold mb-4 text-shadow bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary">
+        你好呀，这里是平仲-92。
+      </h1>
+      <p class="text-[clamp(1rem,2vw,1.25rem)] text-slate-600 mb-8 max-w-2xl mx-auto">
+        INFP | 温良cb人 | 文手+业余画手 | 阿波尼亚友情向梦女 | 话痨小树
+      </p>
+      
+      <div class="flex flex-col sm:flex-row justify-center gap-4">
+        <a href="#contact" class="px-8 py-3 bg-primary hover:bg-primary/90 text-white rounded-full font-medium shadow-lg shadow-primary/20 transition-all transform hover:-translate-y-1">
+          加个好友
+        </a>
+        <a href="#interests" class="px-8 py-3 bg-white hover:bg-amber-50 text-primary border border-primary/30 rounded-full font-medium shadow-md transition-all transform hover:-translate-y-1">
+          了解爱好
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main class="container mx-auto px-4 pb-20 relative z-10">
+    <!-- 个人资料 -->
+    <section id="profile" class="mb-20 scroll-mt-20">
+      <div class="max-w-4xl mx-auto">
+        <h2 class="text-[clamp(1.5rem,3vw,2.5rem)] font-bold mb-8 text-center">
+          个人资料
+        </h2>
+        
+        <div class="bg-white rounded-2xl shadow-xl p-8 md:p-10 card-hover border border-amber-100">
+          <div class="grid md:grid-cols-3 gap-8">
+            <div class="md:col-span-1">
+              <div class="bg-amber-50 rounded-xl p-6 h-full border border-amber-100">
+                <h3 class="text-lg font-semibold mb-4 text-primary">基本信息</h3>
+                <ul class="space-y-4">
+                  <li>
+                    <div class="cn-window">
+                      <div class="text-base font-medium text-slate-900 mb-2">CN</div>
+                      <div class="space-y-2">
+                        <span class="block text-xl font-bold text-primary">平仲</span>
+                        <span class="block text-lg font-semibold text-primary">92</span>
+                      </div>
+                    </div>
+                  </li>
+                  <li class="flex items-start">
+                    <span>属性：INFP</span>
+                  </li>
+                  <li class="flex items-start">
+                    <span>身份：文手+业余画手</span>
+                  </li>
+                  <li class="flex items-start">
+                    <span>阿波尼亚友情向梦女</span>
+                  </li>
+                  <li class="flex items-start">
+                    <span>很好说话的话痨树</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+            
+            <div class="md:col-span-2">
+              <h3 class="text-lg font-semibold mb-4">个人属性</h3>
+              <div class="flex flex-wrap gap-3 mb-6">
+                <span class="px-4 py-2 bg-primary/10 text-primary rounded-full text-sm font-medium tag-hover border border-primary/20">INFP。</span>
+                <span class="px-4 py-2 bg-primary/10 text-primary rounded-full text-sm font-medium tag-hover border border-primary/20">温良cb人。</span>
+                <span class="px-4 py-2 bg-primary/10 text-primary rounded-full text-sm font-medium tag-hover border border-primary/20">文手。</span>
+                <span class="px-4 py-2 bg-primary/10 text-primary rounded-full text-sm font-medium tag-hover border border-primary/20">业余画手。</span>
+                <span class="px-4 py-2 bg-primary/10 text-primary rounded-full text-sm font-medium tag-hover border border-primary/20">阿波尼亚友情向梦女。</span>
+              </div>
+              
+              <h3 class="text-lg font-semibold mb-4">具体爱好</h3>
+              <div class="flex flex-wrap gap-3 mb-6">
+                <span class="px-4 py-2 bg-secondary/10 text-secondary rounded-full text-sm font-medium tag-hover border border-secondary/20">写文创作。</span>
+                <span class="px-4 py-2 bg-secondary/10 text-secondary rounded-full text-sm font-medium tag-hover border border-secondary/20">绘画摸鱼。</span>
+                <span class="px-4 py-2 bg-secondary/10 text-secondary rounded-full text-sm font-medium tag-hover border border-secondary/20">游戏剧情研究。</span>
+                <span class="px-4 py-2 bg-secondary/10 text-secondary rounded-full text-sm font-medium tag-hover border border-secondary/20">番剧追更。</span>
+              </div>
+              
+              <h3 class="text-lg font-semibold mb-4">备注</h3>
+              <div class="bg-amber-50 p-4 rounded-lg border border-amber-100">
+                <p class="text-slate-600 italic">
+                  可摸可摘可抱走，欢迎戳我唠嗑。
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    
+    <!-- 兴趣爱好 -->
+    <section id="interests" class="mb-20 scroll-mt-20">
+      <div class="max-w-4xl mx-auto">
+        <h2 class="text-[clamp(1.5rem,3vw,2.5rem)] font-bold mb-8 text-center">
+          兴趣爱好
+        </h2>
+        
+        <div class="relative mb-12">
+          <h3 class="text-xl font-semibold mb-6">
+            主推角色
+          </h3>
+          
+          <div id="character-scroll" class="flex gap-6 py-4 overflow-x-auto scroll-container">
+            <div class="flex gap-6">
+              <div class="w-full sm:w-80 flex-shrink-0 bg-white rounded-2xl shadow-md overflow-hidden card-hover">
+                <div class="h-48 overflow-hidden relative">
+                  <img src="https://picsum.photos/id/1/400/200" alt="阿波尼亚" 
+                       class="w-full h-full object-cover transition-transform duration-700 hover:scale-110" loading="lazy">
+                  <h3 class="absolute bottom-4 right-4 text-white text-xl font-bold">阿波尼亚</h3>
+                </div>
+              </div>
+              
+              <div class="w-full sm:w-80 flex-shrink-0 bg-white rounded-2xl shadow-md overflow-hidden card-hover">
+                <div class="h-48 overflow-hidden relative">
+                  <img src="https://picsum.photos/id/2/400/200" alt="请输入文本" 
+                       class="w-full h-full object-cover transition-transform duration-700 hover:scale-110" loading="lazy">
+                  <h3 class="absolute bottom-4 right-4 text-white text-xl font-bold">请输入文本</h3>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="mb-12">
+          <h3 class="text-xl font-semibold mb-6">
+            核心爱好
+          </h3>
+          <div class="flex flex-wrap gap-3">
+            <span class="px-5 py-3 bg-gradient-to-r from-primary/10 to-secondary/10 text-slate-800 rounded-xl text-base font-medium tag-hover border border-primary/20">
+              崩坏·星穹铁道
+            </span>
+            <span class="px-5 py-3 bg-gradient-to-r from-primary/10 to-secondary/10 text-slate-800 rounded-xl text-base font-medium tag-hover border border-primary/20">
+              崩坏三
+            </span>
+            <span class="px-5 py-3 bg-gradient-to-r from-primary/10 to-secondary/10 text-slate-800 rounded-xl text-base font-medium tag-hover border border-primary/20">
+              原神/绝区零
+            </span>
+            <span class="px-5 py-3 bg-gradient-to-r from-primary/10 to-secondary/10 text-slate-800 rounded-xl text-base font-medium tag-hover border border-primary/20">
+              小说/番剧
+            </span>
+            <span class="px-5 py-3 bg-gradient-to-r from-primary/10 to-secondary/10 text-slate-800 rounded-xl text-base font-medium tag-hover border border-primary/20">
+              写文/绘画
+            </span>
+          </div>
+        </div>
+        
+        <div class="mb-12">
+          <h3 class="text-xl font-semibold mb-6">
+            关注领域
+          </h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="bg-white p-4 rounded-lg border border-amber-100 shadow-sm flex items-center">
+              <span>cb创作</span>
+            </div>
+            <div class="bg-white p-4 rounded-lg border border-amber-100 shadow-sm flex items-center">
+              <span>阿波尼亚友情向创作</span>
+            </div>
+            <div class="bg-white p-4 rounded-lg border border-amber-100 shadow-sm flex items-center">
+              <span>游戏剧情分析</span>
+            </div>
+            <div class="bg-white p-4 rounded-lg border border-amber-100 shadow-sm flex items-center">
+              <span>绘画技法研究</span>
+            </div>
+          </div>
+        </div>
+        
+        <div>
+          <h3 class="text-xl font-semibold mb-6">
+            雷点
+          </h3>
+          <div class="bg-red-50 p-6 rounded-xl border border-red-100">
+            <div class="flex flex-wrap gap-4">
+              <div class="flex items-center">
+                <span class="w-2 h-2 bg-red-500 rounded-full mr-2"></span>
+                <span>角色抹黑</span>
+              </div>
+              <div class="flex items-center">
+                <span class="w-2 h-2 bg-red-500 rounded-full mr-2"></span>
+                <span>不尊重创作者</span>
+              </div>
+              <div class="flex items-center">
+                <span class="w-2 h-2 bg-red-500 rounded-full mr-2"></span>
+                <span>ky行为</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    
+    <!-- 想认识 & 交流话题 -->
+    <section id="looking-for" class="mb-20 scroll-mt-20">
+      <div class="max-w-4xl mx-auto">
+        <h2 class="text-[clamp(1.5rem,3vw,2.5rem)] font-bold mb-8 text-center">
+          想认识 & 交流话题
+        </h2>
+        
+        <div class="grid md:grid-cols-2 gap-8">
+          <div class="bg-white rounded-2xl shadow-xl p-8 card-hover border border-amber-100">
+            <h3 class="text-xl font-semibold mb-6">
+              想认识的朋友
+            </h3>
+            <ul class="space-y-4">
+              <li class="flex items-start">
+                <i class="fa fa-check-circle text-green-500 mt-1 mr-3"></i>
+                <span>cb同好</span>
+              </li>
+              <li class="flex items-start">
+                <i class="fa fa-check-circle text-green-500 mt-1 mr-3"></i>
+                <span>崩坏三玩家（阿波尼亚厨优先）</span>
+              </li>
+              <li class="flex items-start">
+                <i class="fa fa-check-circle text-green-500 mt-1 mr-3"></i>
+                <span>文手/画手搭子</span>
+              </li>
+              <li class="flex items-start">
+                <i class="fa fa-check-circle text-green-500 mt-1 mr-3"></i>
+                <span>小说/番剧爱好者</span>
+              </li>
+              <li class="flex items-start">
+                <i class="fa fa-check-circle text-green-500 mt-1 mr-3"></i>
+                <span>单纯想唠嗑的朋友</span>
+              </li>
+            </ul>
+          </div>
+          
+          <div class="bg-white rounded-2xl shadow-xl p-8 card-hover border border-amber-100">
+            <h3 class="text-xl font-semibold mb-6">
+              交流话题
+            </h3>
+            <ul class="space-y-4">
+              <li class="flex items-start">
+                <i class="fa fa-comment text-primary mt-1 mr-3"></i>
+                <span>cb相关创作</span>
+              </li>
+              <li class="flex items-start">
+                <i class="fa fa-comment text-primary mt-1 mr-3"></i>
+                <span>崩坏系列剧情分析</span>
+              </li>
+              <li class="flex items-start">
+                <i class="fa fa-comment text-primary mt-1 mr-3"></i>
+                <span>写文/绘画技巧交流</span>
+              </li>
+              <li class="flex items-start">
+                <i class="fa fa-comment text-primary mt-1 mr-3"></i>
+                <span>小说/番剧推荐</span>
+              </li>
+              <li class="flex items-start">
+                <i class="fa fa-comment text-primary mt-1 mr-3"></i>
+                <span>日常唠嗑/亲友贴贴</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+    
+    <!-- 联系方式 -->
+    <section id="contact" class="mb-20 scroll-mt-20">
+      <div class="max-w-4xl mx-auto">
+        <h2 class="text-[clamp(1.5rem,3vw,2.5rem)] font-bold mb-8 text-center">
+          联系方式
+        </h2>
+        
+        <div class="bg-gradient-to-br from-white to-primary/5 rounded-2xl shadow-xl p-8 md:p-10 border border-primary/10 mb-10">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="flex items-center p-4 bg-white rounded-xl border border-amber-100 hover:border-primary/30 transition-colors shadow-sm">
+              <div class="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mr-4">
+                <i class="fa fa-qq text-primary text-xl"></i>
+              </div>
+              <div>
+                <h4 class="font-medium text-sm text-slate-500">QQ</h4>
+                <span class="text-lg text-slate-800">XXXXXXXXX</span>
+              </div>
+            </div>
+            
+            <div class="flex items-center p-4 bg-white rounded-xl border border-amber-100 hover:border-primary/30 transition-colors shadow-sm">
+              <div class="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mr-4">
+                <i class="fa fa-weibo text-primary text-xl"></i>
+              </div>
+              <div>
+                <h4 class="font-medium text-sm text-slate-500">微博</h4>
+                <span class="text-lg text-slate-800">平仲-92</span>
+              </div>
+            </div>
+            
+            <div class="flex items-center p-4 bg-white rounded-xl border border-amber-100 hover:border-primary/30 transition-colors shadow-sm">
+              <div class="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mr-4">
+                <i class="fa fa-pencil text-primary text-xl"></i>
+              </div>
+              <div>
+                <h4 class="font-medium text-sm text-slate-500">LOFTER</h4>
+                <span class="text-lg text-slate-800">平仲92</span>
+              </div>
+            </div>
+            
+            <div class="flex items-center p-4 bg-white rounded-xl border border-amber-100 hover:border-primary/30 transition-colors shadow-sm">
+              <div class="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mr-4">
+                <i class="fa fa-envelope text-primary text-xl"></i>
+              </div>
+              <div>
+                <h4 class="font-medium text-sm text-slate-500">邮箱</h4>
+                <span class="text-lg text-slate-800">pingzhong@example.com</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="mt-8 text-center">
+            <p class="text-slate-600">欢迎来找我玩呀～</p>
+          </div>
+        </div>
+        
+        <div class="bg-white rounded-2xl shadow-xl p-8 md:p-10 card-hover border border-amber-100 mb-10">
+          <h3 class="text-xl font-semibold mb-8 text-primary">
+            好友推荐
+          </h3>
+          
+          <div class="grid grid-cols-1 gap-8">
+            <div class="bg-gradient-to-br from-amber-50 to-yellow-50 rounded-2xl overflow-hidden hover:shadow-lg transition-all duration-300 border border-amber-200/50">
+              <div class="p-6 flex items-center border-b border-amber-200/30">
+                <div class="w-20 h-20 rounded-full overflow-hidden border-3 border-white shadow-md mr-5">
+                  <img src="https://avatars.githubusercontent.com/u/95098372?v=4" 
+                      alt="Clay的头像" 
+                      class="w-full h-full object-cover" loading="lazy">
+                </div>
+                <div>
+                  <h4 class="text-xl font-bold text-primary">星壤/Clay</h4>
+                  <p class="text-slate-600 mt-1 italic">"星穹铁道狂热爱好者｜地理爱好者｜程序猿"</p>
+                </div>
+              </div>
+              
+              <div class="p-6 md:flex md:items-center md:justify-between">
+                <div class="md:flex-1">
+                  <div class="mb-4">
+                    <h5 class="text-sm font-medium text-slate-500 mb-2">个人概述</h5>
+                    <p class="text-slate-700 text-sm">平仲没告诉Clay她对Clay的评价是什么</p>
+                  </div>
+                  
+                  <div>
+                    <h5 class="text-sm font-medium text-slate-500 mb-2">兴趣领域</h5>
+                    <div class="flex flex-wrap gap-2">
+                      <span class="px-3 py-1 bg-primary/10 text-primary text-xs rounded-full">星穹铁道</span>
+                      <span class="px-3 py-1 bg-primary/10 text-primary text-xs rounded-full">轨道交通</span>
+                      <span class="px-3 py-1 bg-primary/10 text-primary text-xs rounded-full">编程</span>
+                      <span class="px-3 py-1 bg-primary/10 text-primary text-xs rounded-full">地理研究</span>
+                    </div>
+                  </div>
+                </div>
+                
+                <div class="mt-6 md:mt-0 md:ml-6 flex justify-center md:block">
+                  <a href="https://clay.castorice.co" target="_blank" rel="noopener noreferrer" 
+                    class="inline-flex items-center justify-center w-16 h-16 bg-primary hover:bg-primary/90 text-white rounded-full font-medium transition-all shadow-md shadow-primary/20 hover:scale-105">
+                    <i class="fa fa-external-link text-xl"></i>
+                  </a>
+                  <p class="mt-2 text-sm text-slate-500 text-center hidden md:block">访问主页</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="mt-8 text-center text-slate-500 text-sm">
+            <p>都是靠谱的小伙伴，欢迎勾搭～</p>
+          </div>
+        </div>
+      </div>
+    </section>
+    
+    <!-- 属性历史记录 -->
+    <section id="history" class="mb-20 scroll-mt-20">
+      <div class="max-w-4xl mx-auto">
+        <h2 class="text-[clamp(1.5rem,3vw,2.5rem)] font-bold mb-8 text-center">
+          属性历史记录
+        </h2>
+        
+        <div class="bg-white rounded-2xl shadow-xl p-8 md:p-10 card-hover border border-amber-100">
+          <div class="relative pl-10 space-y-8">
+            <div class="timeline-item relative">
+              <h4 class="text-lg font-semibold text-primary">2025年11月29日</h4>
+              <p class="text-slate-600 mt-2">建站。</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- 页脚 -->
+  <footer class="bg-white/90 backdrop-blur-md py-6 border-t border-amber-100 relative z-10">
+    <div class="container mx-auto px-4 text-center text-slate-500 text-sm">
+      <p>平仲空间站 92 Space Station &copy; 2025-2026 保留所有权利</p>
+      <p class="mt-2">愿我们的故事，永远未完待续。！</p> 
+      <p class="mt-2">ICP备案号 。？？？</p>
+    </div>
+  </footer>
+
+  <script>
+    // 导航栏滚动效果
+    const navbar = document.getElementById('navbar');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 50) {
+        navbar.classList.add('py-2', 'shadow');
+        navbar.classList.remove('py-3', 'shadow-sm');
+      } else {
+        navbar.classList.add('py-3', 'shadow-sm');
+        navbar.classList.remove('py-2', 'shadow');
+      }
+    });
+    
+    // 移动端菜单切换
+    const menuBtn = document.getElementById('menuBtn');
+    const mobileMenu = document.getElementById('mobileMenu');
+    menuBtn.addEventListener('click', () => {
+      mobileMenu.classList.toggle('hidden');
+      const icon = menuBtn.querySelector('i');
+      icon.classList.toggle('fa-bars');
+      icon.classList.toggle('fa-times');
+    });
+    
+    // 平滑滚动
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        if (!mobileMenu.classList.contains('hidden')) {
+          mobileMenu.classList.add('hidden');
+          const icon = menuBtn.querySelector('i');
+          icon.classList.add('fa-bars');
+          icon.classList.remove('fa-times');
+        }
+        document.querySelector(this.getAttribute('href')).scrollIntoView({
+          behavior: 'smooth'
+        });
+      });
+    });
+    
+    const highlightNavOnScroll = () => {
+      const navLinks = document.querySelectorAll('.nav-link');
+      const sections = document.querySelectorAll('section[id]');
+      
+      let currentSection = '';
+      
+      sections.forEach(section => {
+        const sectionTop = section.offsetTop;
+        const sectionHeight = section.clientHeight;
+        if (window.scrollY >= sectionTop && window.scrollY < sectionTop + sectionHeight) {
+          currentSection = section.getAttribute('id');
+        }
+      });
+      
+      navLinks.forEach(link => {
+        link.classList.remove('nav-active');
+        if (link.getAttribute('href') === `#${currentSection}`) {
+          link.classList.add('nav-active');
+        }
+      });
+    };
+    
+    const animateOnScroll = () => {
+      const cards = document.querySelectorAll('.card-hover');
+      cards.forEach(card => {
+        const cardTop = card.getBoundingClientRect().top;
+        const triggerBottom = window.innerHeight * 0.8;
+        
+        if (cardTop < triggerBottom) {
+          card.classList.add('opacity-100', 'translate-y-0');
+          card.classList.remove('opacity-0', 'translate-y-10');
+        }
+      });
+    };
+    
+    document.querySelectorAll('.card-hover').forEach(card => {
+      card.classList.add('transition-all', 'duration-700', 'opacity-0', 'translate-y-10');
+    });
+    
+    window.addEventListener('load', () => {
+      highlightNavOnScroll();
+      animateOnScroll();
+    });
+    window.addEventListener('scroll', () => {
+      highlightNavOnScroll();
+      animateOnScroll();
+    });
+  </script>
+</body>
+</html>
